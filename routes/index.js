@@ -1,9 +1,7 @@
-var express = require('express');
-var router = express.Router();
+const version = 'v1';
+const baseURL = `/api/${version}`;
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-module.exports = router;
+module.exports = (app) => {
+  app.use(`${baseURL}/`, require(`./${version}/index`));
+  app.use(`${baseURL}/users`, require(`./${version}/users`));
+};
