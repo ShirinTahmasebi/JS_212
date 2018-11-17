@@ -9,11 +9,11 @@ const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
+require('./bootstrap');
 require('./routes')(app);
-
 require('./errors')(app);
 
 module.exports = app;
