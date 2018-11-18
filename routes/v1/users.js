@@ -1,17 +1,22 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-/* GET users listing. */
 router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
-router.get("/getQuestionsCount", (req, res, next) => {
-  mysql_connection = require('../../bootstrap/mysql_connection');
-  mysql_connection.query('SELECT count(*) as questions_count FROM questions', function (error, results, fields) {
-    if (error) throw error;
-    res.json(results);
-  });
+router.get("/getQuestion", (req, res, next) => {
+  execute_query = require('../../bootstrap/mysql_connection').execute_query;
+  return execute_query('SELECT * FROM questions',
+    (results, fields) => {
+      const selected_question_index = Math.floor((Math.random() * results.length));
+      return res.json(results[selected_question_index]);
+    },
+    (error) => {
+      return error;
+    },
+  );
 });
 
-module.exports = router;
+onFailure =
+  module.exports = router;
