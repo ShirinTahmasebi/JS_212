@@ -1,6 +1,14 @@
+module.exports.doAuthentication = (user_id) => {
+  if (user_id) {
+    // TODO: Do authentication
+  } else {
+    return (new Error(401));
+  }
+};
+
 const createError = require('http-errors');
 
-module.exports = (app) => {
+module.exports.errors = (app) => {
   app.use(function (req, res, next) {
     next(createError(404));
   });

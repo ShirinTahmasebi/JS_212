@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
+  res.json({ping: "PONG"});
 });
 
-router.get("/getQuestion", (req, res, next) => {
+router.post("/getQuestion", (req, res, next) => {
   execute_query = require('../../bootstrap/mysql_connection').execute_query;
   return execute_query('SELECT * FROM questions',
     (results, fields) => {

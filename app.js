@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/v1/users');
+const usersRouter = require('./routes/v1/questions');
 
 const app = express();
 
@@ -14,6 +14,6 @@ app.use(cookieParser());
 
 require('./bootstrap');
 require('./routes')(app);
-require('./errors')(app);
+require('./services').errors(app);
 
 module.exports = app;
