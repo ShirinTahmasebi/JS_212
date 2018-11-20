@@ -1,6 +1,8 @@
-const webservices_errors = require("./error_codes").ERRORS.web_service_errors;
+const webservices_errors = require("./errors/error_codes").ERRORS.web_service_errors;
 const version = 'v1';
 const baseURL = `/api/${version}`;
+const questionsDirectory = "questions/questions";
+const answersDirectory = "questions/answers";
 const questionsNameSpace = "questions";
 
 module.exports = (app) => {
@@ -18,7 +20,9 @@ module.exports = (app) => {
 
   app.use(`${baseURL}/`, require(`./${version}/index`));
 
-  app.use(`${baseURL}/${questionsNameSpace}`, require(`./${version}/${questionsNameSpace}`));
+  app.use(`${baseURL}/${questionsNameSpace}`, require(`./${version}/${questionsDirectory}`));
+
+  app.use(`${baseURL}/${questionsNameSpace}`, require(`./${version}/${answersDirectory}`));
 
   app.all('*', function (req, res, next) {
     let data = {};

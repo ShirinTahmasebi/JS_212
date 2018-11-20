@@ -20,3 +20,7 @@ module.exports.execute_query = (query_text, query_variables) => {
     });
   });
 };
+
+module.exports.error_log = (error) => {
+  // TODO: Log Error
+};
