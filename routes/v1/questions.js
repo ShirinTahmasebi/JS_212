@@ -9,14 +9,13 @@ router.get('/', function (req, res, next) {
 });
 
 router.post("/getQuestion", (req, res, next) => {
-  execute_query(mysql_queries.get_all)
-    .then((results, fields) => {
-      res.data = results[Math.floor((Math.random() * results.length))];
-    })
-    .catch(error => {
-      res.error_code = database_errors.CODE_100001.code;
-      res.error_message = database_errors.CODE_100001.message;
-    }).finally(() => next());
+  execute_query(mysql_queries.get_random_question).then((result) => {
+    res.data = result[0] || {};
+  }).catch((error) => {
+    // TODO: Log error
+    res.error_code = database_errors.CODE_100001.code;
+    res.error_message = database_errors.CODE_100001.message;
+  }).finally(() => next());
 });
 
 module.exports = router;

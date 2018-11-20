@@ -16,7 +16,7 @@ module.exports.execute_query = (query_text, query_variables) => {
       if (error) {
         return reject(error);
       }
-      resolve(results);
+      resolve(results, fields);
     });
   });
 };
