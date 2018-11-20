@@ -1,4 +1,4 @@
-const ERRORS = require("./error_codes").ERRORS;
+const webservices_errors = require("./error_codes").ERRORS.web_service_errors;
 const version = 'v1';
 const baseURL = `/api/${version}`;
 const questionsNameSpace = "questions";
@@ -11,7 +11,7 @@ module.exports = (app) => {
       next();
     } else {
       res.json({
-        'error': ERRORS.CODE_401,
+        'error': webservices_errors.CODE_401,
       });
     }
   });
@@ -28,7 +28,7 @@ module.exports = (app) => {
     } else if (res.data) {
       data = res.data;
     } else {
-      error = ERRORS.CODE_404;
+      error = webservices_errors.CODE_404;
     }
     res.json({
       'error': error,

@@ -1,4 +1,7 @@
 const express = require('express');
+const mysql_queries = require('../../db/queries').mysql.questions;
+const database_errors = require("../error_codes").ERRORS.database_errors;
+const execute_query = require('../../db/mysql_connection').execute_query;
 const router = express.Router();
 
 router.get('/', function (req, res, next) {
@@ -6,18 +9,14 @@ router.get('/', function (req, res, next) {
 });
 
 router.post("/getQuestion", (req, res, next) => {
-  execute_query = require('../../bootstrap/mysql_connection').execute_query;
-  execute_query('SELECT * FROM questions',
-    (results, fields) => {
-      const selected_question_index = Math.floor((Math.random() * results.length));
-      res.data = results[selected_question_index];
-    },
-    (error_code, error_message) => {
-      res.error_code = error_code;
-      res.error_message = error_message;
-    },
-    next,
-  );
+  execute_query(mysql_queries.get_all)
+    .then((results, fields) => {
+      res.data = results[Math.floor((Math.random() * results.length))];
+    })
+    .catch(error => {
+      res.error_code = database_errors.CODE_100001.code;
+      res.error_message = database_errors.CODE_100001.message;
+    }).finally(() => next());
 });
 
-onFailure = module.exports = router;
+module.exports = router;

@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
-require('./bootstrap');
+require('./db');
 require('./routes')(app);
 require('./services').errors(app);
 
