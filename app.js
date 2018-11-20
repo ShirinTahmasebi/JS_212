@@ -2,9 +2,6 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/v1/questions');
-
 const app = express();
 
 app.use(logger('dev'));

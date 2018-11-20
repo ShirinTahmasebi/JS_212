@@ -10,11 +10,12 @@ const mysql_connection = mysql.createConnection({
 
 mysql_connection.connect();
 
-module.exports.execute_query = (query_text, onSuccess, onFailure) => {
+module.exports.execute_query = (query_text, onSuccess, onFailure, onBothNext) => {
   mysql_connection.query(query_text, function (error, results, fields) {
     if (error) {
       onFailure(error);
     }
-    return onSuccess(results, fields);
+    onSuccess(results, fields);
+    onBothNext();
   });
 };

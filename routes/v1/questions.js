@@ -7,16 +7,17 @@ router.get('/', function (req, res, next) {
 
 router.post("/getQuestion", (req, res, next) => {
   execute_query = require('../../bootstrap/mysql_connection').execute_query;
-  return execute_query('SELECT * FROM questions',
+  execute_query('SELECT * FROM questions',
     (results, fields) => {
       const selected_question_index = Math.floor((Math.random() * results.length));
-      return res.json(results[selected_question_index]);
+      res.data = results[selected_question_index];
     },
-    (error) => {
-      return error;
+    (error_code, error_message) => {
+      res.error_code = error_code;
+      res.error_message = error_message;
     },
+    next,
   );
 });
 
-onFailure =
-  module.exports = router;
+onFailure = module.exports = router;

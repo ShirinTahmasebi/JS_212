@@ -1,8 +1,9 @@
 module.exports.doAuthentication = (user_id) => {
   if (user_id) {
     // TODO: Do authentication
+    return true;
   } else {
-    return (new Error(401));
+    return false;
   }
 };
 
