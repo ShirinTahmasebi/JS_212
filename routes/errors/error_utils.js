@@ -5,3 +5,8 @@ module.exports.append_database_error_to_response = (response, error) => {
   const database_error_log = require('../../db/mysql_connection').error_log;
   database_error_log(error);
 };
+
+module.exports.append_custom_error_to_response = (response, error) => {
+  response.error_code = error.code;
+  response.error_message = error.message;
+};
