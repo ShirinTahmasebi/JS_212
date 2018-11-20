@@ -5,6 +5,7 @@ const execute_query = require('../../db/mysql_connection').execute_query;
 const router = express.Router();
 
 this.getQueryBasedOnQuestionType = (question_type) => {
+  question_type = parseInt(question_type) || 0;
   switch (question_type) {
     case 1:
       query = mysql_queries.get_random_simple_question;
@@ -23,8 +24,8 @@ router.get('/', function (req, res, next) {
   res.json({ping: "PONG"});
 });
 
-router.post("/getQuestion", (req, res, next) => {
-  execute_query(this.getQueryBasedOnQuestionType(req.body.question_type)).then((result) => {
+router.get("/single", (req, res, next) => {
+  execute_query(this.getQueryBasedOnQuestionType(req.query.question_type)).then((result) => {
     res.data = result[0] || {};
   }).catch((error) => {
     // TODO: Log error
