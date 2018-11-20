@@ -1,4 +1,4 @@
-const append_database_error_to_response = require("../../errors/error_utils");
+const append_database_error_to_response = require("../../errors/error_utils").append_database_error_to_response;
 const express = require('express');
 const mysql_queries = require('../../../db/queries').mysql;
 const errors = require("../../errors/error_codes").ERRORS;
