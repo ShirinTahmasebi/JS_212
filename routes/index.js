@@ -8,7 +8,7 @@ const questionsNameSpace = "questions";
 module.exports = (app) => {
 
   app.all('*', function (req, res, next) {
-    const doAuth = require("../services").doAuthentication(req.headers.user_id);
+    const doAuth = require("../utils/services").doAuthentication(req.headers.user_id);
     if (doAuth) {
       next();
     } else {

@@ -11,6 +11,6 @@ app.use(cookieParser());
 
 require('./db')();
 require('./routes')(app);
-require('./services').errors(app);
+require('./utils/services').errors(app);
 
 module.exports = app;

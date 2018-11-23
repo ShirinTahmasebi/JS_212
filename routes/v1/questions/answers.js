@@ -1,69 +1,94 @@
-const append_database_error_to_response = require("../../errors/error_utils").append_database_error_to_response;
-const append_custom_error_to_response = require("../../errors/error_utils").append_custom_error_to_response;
+const to = require("../../../utils/to").to;
+const append_error_and_call_next = require("../../../utils/to").append_error_and_call_next;
 const express = require('express');
 const mysql_queries = require('../../../db/queries').mysql;
 const errors = require("../../errors/error_codes").ERRORS;
 const execute_query = require('../../../db/mysql_connection').execute_query;
 const router = express.Router();
+const question_types = require('../../../model/question_types');
 
 router.get('/answer', function (req, res, next) {
   res.json({felan: "BISAR"});
 });
 
-router.post("/:question_id/answer", (requset, response, next) => {
+this.validate_answer_to_multichoice_question = async (request, response) => {
+  const question_id = request.params.question_id;
+  const answer_choices_ids = request.body.answer_choices_ids;
+
+  const [err, result] = await to(execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', question_id)));
+  if (err) return err;
+
+  const question_choices_ids = [];
+  for (const item of result) {
+    question_choices_ids.push(item.choice_id);
+  }
+
+  let are_choices_valid = true;
+  for (const choice of answer_choices_ids) {
+    are_choices_valid && question_choices_ids.includes(choice);
+  }
+  if (are_choices_valid) {
+    console.log('Choices are valid');
+    return null;
+    // TODO: Store answer in MongoDB
+    // TODO: Store answered question id in Redis
+  }
+};
+
+this.validate_answer_to_simple_question = async (request, response) => {
+  const question_id = request.params.question_id;
+  const answer_text = request.body.answer_text;
+
+  // TODO: Store answer in MongoDB
+  const answer_model = require('../../../model/mongo_models/answers');
+  let answer = new answer_model();
+  answer.question_id = question_id;
+  answer.user_id = request.headers.user_id;
+  answer.answer = answer_text;
+  answer.question_type = question_types.SIMPLE;
+  const [error, mongoos_res] = await to(answer.save());
+  if (error) return error;
+  console.log(mongoos_res);
+  response.data = mongoos_res;
+
+  // TODO: Store answered question id in Redis
+  return null;
+};
+
+
+router.post("/:question_id/answer", async (request, response, next) => {
+
   // Retrieve important data from body
-  const question_id = requset.params.question_id;
-  const answer_text = requset.body.answer_text;
-  const answer_choices_ids = requset.body.answer_choices_ids;
+  const question_id = request.params.question_id;
+  const answer_text = request.body.answer_text;
+  const answer_choices_ids = request.body.answer_choices_ids;
+
+  const [error, question_types_result] = await to(execute_query(mysql_queries.questions.get_question_type_by_question_id.replace('{question_id}', question_id)));
+  if (error) {
+    append_error_and_call_next(response, error, next);
+    return;
+  }
+
+  let validate_answer_error;
+  const question_type = parseInt(question_types_result[0].question_type) || 0;
 
   // Get question type to check if the answer is valid or not
-  execute_query(mysql_queries.questions.get_question_type_by_question_id.replace('{question_id}', question_id))
-    .then((question_types_result) => {
-      const question_type = parseInt(question_types_result[0].question_type) || 0;
-      if (question_type === 1 && answer_text) {
-        // TODO: Store answer in MongoDB
-        const answer_model = require('../../../model/mongo_models/answers');
-        let answer = new answer_model();
-        answer.question_id = question_id;
-        answer.user_id = requset.headers.user_id;
-        answer.save().then(
-          (res) => {
-            console.log(res);
-            response.data = res;
-          },
-        );
-        // TODO: Store answered question id in Redis
-        throw new Error('handled');
-      } else if (question_type === 2 && answer_choices_ids) {
-        return execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', question_id));
-      } else {
-        // Probably question id is not valid
-        append_custom_error_to_response(response, errors.logic_errors.CODE_200001);
-      }
-    })
-    .then(result => {
-      const question_choices_ids = [];
-      for (const item of result) {
-        question_choices_ids.push(item.choice_id);
-      }
+  if (question_type === question_types.SIMPLE && answer_text) {
+    validate_answer_error = this.validate_answer_to_simple_question(request, response);
+  } else if (question_type === question_types.MULTI_CHOICE && answer_choices_ids) {
+    validate_answer_error = this.validate_answer_to_multichoice_question(request, response);
+  } else {
+    // Probably question id is not valid
+    validate_answer_error = errors.logic_errors.CODE_200001;
+  }
 
-      let are_choices_valid = true;
-      for (const choice of answer_choices_ids) {
-        are_choices_valid && question_choices_ids.includes(choice);
-      }
-      if (are_choices_valid) {
-        console.log('Choices are valid');
-        // TODO: Store answer in MongoDB
-        // TODO: Store answered question id in Redis
-      }
-    })
-    .catch(error => {
-      if (error.message === 'handled') {
-      } else {
-        append_custom_error_to_response(response, error);
-      }
-    })
-    .finally(() => next());
+  // Check results - If validate_answer_error return it else go to next middleware
+  if (validate_answer_error) {
+    append_error_and_call_next(response, validate_answer_error, next);
+    return;
+  }
+  next();
+
 });
 
 module.exports = router;
