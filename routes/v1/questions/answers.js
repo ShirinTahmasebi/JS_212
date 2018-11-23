@@ -6,6 +6,6 @@ router.get('/answer', function (req, res, next) {
   res.json({felan: "BISAR"});
 });
 
-router.post("/:question_id/answer", (request, response, next) => answer_controller.answers.post(request, response, next));
+router.post("/:question_id/answer", (request, response, next) => answer_controller.post(request, response, next));
 
 module.exports = router;

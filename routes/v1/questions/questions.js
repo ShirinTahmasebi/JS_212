@@ -6,6 +6,6 @@ router.get('/', function (req, res, next) {
   res.json({ping: "PONG"});
 });
 
-router.get("/single", (req, res, next) => question_controller.questions.get_single_question(req, res, next));
+router.get("/single", (req, res, next) => question_controller.get_single_question(req, res, next));
 
 module.exports = router;
