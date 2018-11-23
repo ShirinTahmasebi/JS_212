@@ -4,7 +4,7 @@ const mysql_queries = require('../../../db/queries').mysql;
 const errors = require("../../../routes/errors/error_codes").ERRORS;
 const execute_query = require('../../../db/mysql_connection').execute_query;
 const question_types = require('../../../model/question_types');
-
+const answer_dto = require('../../../repository/v1/index').answers;
 
 module.exports.post = async (request, response, next) => {
   // Retrieve important data from body
@@ -45,6 +45,7 @@ module.exports.post = async (request, response, next) => {
 this.validate_answer_to_multichoice_question = async (request, response) => {
   const question_id = request.params.question_id;
   const answer_choices_ids = request.body.answer_choices_ids;
+  const user_id = request.headers.user_id;
 
   const [err, result] = await to(execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', question_id)));
   if (err) return [err, null];
@@ -60,7 +61,10 @@ this.validate_answer_to_multichoice_question = async (request, response) => {
   }
 
   if (are_choices_valid) {
-    // TODO: Store answer in MongoDB
+    // Store answer in MongoDB
+    const [err, res] = await answer_dto.save_answer_to_mongodb(question_id, user_id, answer_choices_ids, question_types.MULTI_CHOICE);
+    if (err) return [err, null];
+
     // TODO: Store answered question id in Redis
     return [null, {question_id, answer_choices_ids, 'question_type': question_types.MULTI_CHOICE}];
   } else {
@@ -71,16 +75,12 @@ this.validate_answer_to_multichoice_question = async (request, response) => {
 this.validate_answer_to_simple_question = async (request, response) => {
   const question_id = request.params.question_id;
   const answer_text = request.body.answer_text;
+  const user_id = request.headers.user_id;
 
-  // TODO: Store answer in MongoDB
-  const answer_model = require('../../../model/mongo_models/answers');
-  let answer = await new answer_model();
-  answer.question_id = question_id;
-  answer.user_id = request.headers.user_id;
-  answer.answer = answer_text;
-  answer.question_type = question_types.SIMPLE;
-  const [error, mongoos_res] = await to(answer.save());
-  if (error) return [error, null];
+  // Store answer in MongoDB
+  const [err, res] = await answer_dto.save_answer_to_mongodb(question_id, user_id, answer_text, question_types.SIMPLE);
+  if (err) return [err, null];
+
   // TODO: Store answered question id in Redis
   return [null, {question_type: question_types.SIMPLE, question_id, answer_text}];
 };
