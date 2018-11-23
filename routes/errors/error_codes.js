@@ -8,7 +8,8 @@ module.exports.ERRORS = {
     CODE_100002: {code: 100002, message: 'QUESTION_NOT_FOUND'},
   },
   logic_errors: {
-    CODE_200001: {code: 200001, message: 'Question and answer types mismatched!'},
+    CODE_200001: {code: 200001, message: 'QUESTION_ANSWER_TYPE_MISMATCH'},
+    CODE_200002: {code: 200002, message: 'INVALID_CHOICE_IDS'},
   },
 }
 ;

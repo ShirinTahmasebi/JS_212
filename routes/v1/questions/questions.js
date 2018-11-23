@@ -5,6 +5,7 @@ const execute_query = require('../../../db/mysql_connection').execute_query;
 const router = express.Router();
 
 this.getQueryByQuestionType = (question_type) => {
+  if (!question_type) return mysql_queries.get_random_question;
   question_type = parseInt(question_type) || 0;
   let query;
   switch (question_type) {
@@ -13,9 +14,6 @@ this.getQueryByQuestionType = (question_type) => {
       break;
     case 2:
       query = mysql_queries.get_random_multi_choice_question;
-      break;
-    default:
-      query = mysql_queries.get_random_question;
       break;
   }
   return query;

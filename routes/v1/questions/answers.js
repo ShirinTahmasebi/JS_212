@@ -16,7 +16,7 @@ this.validate_answer_to_multichoice_question = async (request, response) => {
   const answer_choices_ids = request.body.answer_choices_ids;
 
   const [err, result] = await to(execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', question_id)));
-  if (err) return err;
+  if (err) return [err, null];
 
   const question_choices_ids = [];
   for (const item of result) {
@@ -25,13 +25,15 @@ this.validate_answer_to_multichoice_question = async (request, response) => {
 
   let are_choices_valid = true;
   for (const choice of answer_choices_ids) {
-    are_choices_valid && question_choices_ids.includes(choice);
+    are_choices_valid = are_choices_valid && question_choices_ids.includes(choice);
   }
+
   if (are_choices_valid) {
-    console.log('Choices are valid');
-    return null;
     // TODO: Store answer in MongoDB
     // TODO: Store answered question id in Redis
+    return [null, {question_id, answer_choices_ids, 'question_type': question_types.MULTI_CHOICE}];
+  } else {
+    return [errors.logic_errors.CODE_200002, null];
   }
 };
 
@@ -41,18 +43,15 @@ this.validate_answer_to_simple_question = async (request, response) => {
 
   // TODO: Store answer in MongoDB
   const answer_model = require('../../../model/mongo_models/answers');
-  let answer = new answer_model();
+  let answer = await new answer_model();
   answer.question_id = question_id;
   answer.user_id = request.headers.user_id;
   answer.answer = answer_text;
   answer.question_type = question_types.SIMPLE;
   const [error, mongoos_res] = await to(answer.save());
-  if (error) return error;
-  console.log(mongoos_res);
-  response.data = mongoos_res;
-
+  if (error) return [error, null];
   // TODO: Store answered question id in Redis
-  return null;
+  return [null, {question_type: question_types.SIMPLE, question_id, answer_text}];
 };
 
 
@@ -70,13 +69,14 @@ router.post("/:question_id/answer", async (request, response, next) => {
   }
 
   let validate_answer_error;
+  let validate_answer_response;
   const question_type = parseInt(question_types_result[0].question_type) || 0;
 
   // Get question type to check if the answer is valid or not
   if (question_type === question_types.SIMPLE && answer_text) {
-    validate_answer_error = this.validate_answer_to_simple_question(request, response);
+    [validate_answer_error, validate_answer_response] = await this.validate_answer_to_simple_question(request, response);
   } else if (question_type === question_types.MULTI_CHOICE && answer_choices_ids) {
-    validate_answer_error = this.validate_answer_to_multichoice_question(request, response);
+    [validate_answer_error, validate_answer_response] = await this.validate_answer_to_multichoice_question(request, response);
   } else {
     // Probably question id is not valid
     validate_answer_error = errors.logic_errors.CODE_200001;
@@ -87,6 +87,7 @@ router.post("/:question_id/answer", async (request, response, next) => {
     append_error_and_call_next(response, validate_answer_error, next);
     return;
   }
+  response.data = validate_answer_response;
   next();
 
 });
