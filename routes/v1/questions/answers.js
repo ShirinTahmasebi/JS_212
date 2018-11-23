@@ -22,13 +22,23 @@ router.post("/:question_id/answer", (requset, response, next) => {
       const question_type = parseInt(question_types_result[0].question_type) || 0;
       if (question_type === 1 && answer_text) {
         // TODO: Store answer in MongoDB
+        const answer_model = require('../../../model/mongo_models/answers');
+        let answer = new answer_model();
+        answer.question_id = question_id;
+        answer.user_id = requset.headers.user_id;
+        answer.save().then(
+          (res) => {
+            console.log(res);
+            response.data = res;
+          },
+        );
         // TODO: Store answered question id in Redis
+        throw new Error('handled');
       } else if (question_type === 2 && answer_choices_ids) {
         return execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', question_id));
       } else {
         // Probably question id is not valid
         append_custom_error_to_response(response, errors.logic_errors.CODE_200001);
-        throw new Error('handled');
       }
     })
     .then(result => {

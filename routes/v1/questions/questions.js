@@ -4,7 +4,7 @@ const database_errors = require("../../errors/error_codes").ERRORS.database_erro
 const execute_query = require('../../../db/mysql_connection').execute_query;
 const router = express.Router();
 
-this.getQueryBasedOnQuestionType = (question_type) => {
+this.getQueryByQuestionType = (question_type) => {
   question_type = parseInt(question_type) || 0;
   let query;
   switch (question_type) {

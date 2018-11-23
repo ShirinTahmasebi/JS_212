@@ -1,14 +1,18 @@
-const mysql = require('mysql');
+let mysql_connection;
 
-const mysql_connection = mysql.createConnection({
-  host: '127.0.0.1',
-  port: '3306',
-  user: 'root',
-  password: '12345678',
-  database: 'JS_212',
-});
+module.exports.create_connection = () => {
+  const mysql = require('mysql');
 
-mysql_connection.connect();
+  mysql_connection = mysql.createConnection({
+    host: '127.0.0.1',
+    port: '3306',
+    user: 'root',
+    password: '12345678',
+    database: 'JS_212',
+  });
+
+  mysql_connection.connect();
+};
 
 module.exports.execute_query = (query_text, query_variables) => {
   return new Promise((resolve, reject) => {
