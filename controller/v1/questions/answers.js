@@ -4,7 +4,7 @@ const mysql_queries = require('../../../db/queries').mysql;
 const errors = require("../../../routes/errors/error_codes").ERRORS;
 const execute_query = require('../../../db/mysql_connection').execute_query;
 const question_types = require('../../../model/question_types');
-const answer_dto = require('../../../repository/v1/index').answers;
+const answer_repository = require('../../../repository/v1/index').answers;
 
 module.exports.post = async (request, response, next) => {
   // Retrieve important data from body
@@ -62,7 +62,7 @@ this.validate_answer_to_multichoice_question = async (request, response) => {
 
   if (are_choices_valid) {
     // Store answer in MongoDB
-    const [err, res] = await answer_dto.save_answer_to_mongodb(question_id, user_id, answer_choices_ids, question_types.MULTI_CHOICE);
+    const [err, res] = await answer_repository.save_answer_to_mongodb(question_id, user_id, answer_choices_ids, question_types.MULTI_CHOICE);
     if (err) return [err, null];
 
     // TODO: Store answered question id in Redis
@@ -78,7 +78,7 @@ this.validate_answer_to_simple_question = async (request, response) => {
   const user_id = request.headers.user_id;
 
   // Store answer in MongoDB
-  const [err, res] = await answer_dto.save_answer_to_mongodb(question_id, user_id, answer_text, question_types.SIMPLE);
+  const [err, res] = await answer_repository.save_answer_to_mongodb(question_id, user_id, answer_text, question_types.SIMPLE);
   if (err) return [err, null];
 
   // TODO: Store answered question id in Redis
