@@ -47,7 +47,7 @@ this.validate_answer_to_multichoice_question = async (request, response) => {
   const answer_choices_ids = request.body.answer_choices_ids;
   const user_id = request.headers.user_id;
 
-  const [err, result] = await to(execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', question_id)));
+  const [err, result] = await to(execute_query(mysql_queries.answers.get_choice_ids_by_question_id.replace('{question_id}', question_id)));
   if (err) return [err, null];
 
   const question_choices_ids = [];

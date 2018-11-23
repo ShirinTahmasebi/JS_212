@@ -158,7 +158,7 @@ describe('POST /api/v1/questions/{multichoice_question_id}/answer', function () 
     const execute_query = require('../../../db/mysql_connection').execute_query;
     const mysql_queries = require('../../../db/queries').mysql;
 
-    const result = await execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', multi_choice_question_id));
+    const result = await execute_query(mysql_queries.answers.get_choice_ids_by_question_id.replace('{question_id}', multi_choice_question_id));
 
     for (const item of result) {
       await answer_choices_ids.push(item.choice_id);
@@ -208,7 +208,7 @@ describe('POST /api/v1/questions/{multichoice_question_id}/answer', function () 
     const execute_query = require('../../../db/mysql_connection').execute_query;
     const mysql_queries = require('../../../db/queries').mysql;
 
-    const result = await execute_query(mysql_queries.answers.get_answer_choice_ids_by_question_id.replace('{question_id}', multi_choice_question_id));
+    const result = await execute_query(mysql_queries.answers.get_choice_ids_by_question_id.replace('{question_id}', multi_choice_question_id));
 
     for (const item of result) {
       await answer_choices_ids.push(item.choice_id + 10000);

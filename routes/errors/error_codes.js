@@ -6,6 +6,7 @@ module.exports.ERRORS = {
   database_errors: {
     CODE_100001: {code: 100001, message: 'RETRIEVE_QUESTIONS_PROBLEM'},
     CODE_100002: {code: 100002, message: 'QUESTION_NOT_FOUND'},
+    CODE_100003: {code: 100003, message: 'RETRIEVE_CHOICES_PROBLEM'},
   },
   logic_errors: {
     CODE_200001: {code: 200001, message: 'QUESTION_ANSWER_TYPE_MISMATCH'},
