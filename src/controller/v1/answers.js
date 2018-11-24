@@ -1,10 +1,10 @@
-const to = require("../../../utils/utils").to;
-const append_error_and_call_next = require("../../../utils/utils").append_error_and_call_next;
-const mysql_queries = require('../../../db/queries').mysql;
-const errors = require("../../../routes/errors/error_codes").ERRORS;
-const execute_query = require('../../../db/mysql_connection').execute_query;
-const question_types = require('../../../model/question_types');
-const answer_repository = require('../../../repository/v1/index').answers;
+const to = require("../../utils/utils").to;
+const append_error_and_call_next = require("../../utils/utils").append_error_and_call_next;
+const mysql_queries = require('../../db/queries').mysql;
+const errors = require("../../routes/errors/error_codes").ERRORS;
+const execute_query = require('../../db/mysql_connection').execute_query;
+const question_types = require('../../model/question_types');
+const answer_repository = require('../../repository/v1/index').answers;
 
 module.exports.post = async (request, response, next) => {
   // Retrieve important data from body

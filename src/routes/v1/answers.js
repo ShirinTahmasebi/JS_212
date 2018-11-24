@@ -1,4 +1,4 @@
-const answer_controller = require('../../../controller/v1/index').answers;
+const answer_controller = require('../../controller/v1/index').answers;
 const express = require('express');
 const router = express.Router();
 

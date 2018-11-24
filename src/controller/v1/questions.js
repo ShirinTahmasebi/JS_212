@@ -1,8 +1,8 @@
-const mysql_queries = require('../../../db/queries').mysql;
-const database_errors = require("../../../routes/errors/error_codes").ERRORS.database_errors;
-const execute_query = require('../../../db/mysql_connection').execute_query;
-const to = require("../../../utils/utils").to;
-const append_error_and_call_next = require("../../../utils/utils").append_error_and_call_next;
+const mysql_queries = require('../../db/queries').mysql;
+const database_errors = require("../../routes/errors/error_codes").ERRORS.database_errors;
+const execute_query = require('../../db/mysql_connection').execute_query;
+const to = require("../../utils/utils").to;
+const append_error_and_call_next = require("../../utils/utils").append_error_and_call_next;
 
 module.exports.get_single_question = async (req, res, next) => {
   const [get_question_query, get_choices_query] = await this.get_query_by_question_type(req.query.question_type);
@@ -29,9 +29,9 @@ module.exports.get_single_question = async (req, res, next) => {
 };
 
 this.get_query_by_question_type = async (question_type) => {
-  const QUESTION_TYPES = require('../../../model/question_types');
+  const QUESTION_TYPES = require('../../model/question_types');
   if (!question_type) {
-    const enum_element_count = require("../../../utils/utils").enum_element_count;
+    const enum_element_count = require("../../utils/utils").enum_element_count;
     question_type = Math.floor((Math.random() * enum_element_count(QUESTION_TYPES) + 1));
   }
   question_type = parseInt(question_type) || 0;

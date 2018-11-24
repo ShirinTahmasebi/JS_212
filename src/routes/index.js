@@ -1,8 +1,8 @@
 const webservices_errors = require("./errors/error_codes").ERRORS.web_service_errors;
 const version = 'v1';
 const baseURL = `/api/${version}`;
-const questionsDirectory = "questions/questions";
-const answersDirectory = "questions/answers";
+const questionsDirectory = "questions";
+const answersDirectory = "answers";
 const questionsNameSpace = "questions";
 
 module.exports = (app) => {

@@ -1,2 +1,2 @@
-module.exports.questions = require('./questions/questions');
-module.exports.answers = require('./questions/answers');
+module.exports.questions = require('./questions');
+module.exports.answers = require('./answers');
