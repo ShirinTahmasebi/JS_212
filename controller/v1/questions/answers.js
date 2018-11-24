@@ -1,5 +1,5 @@
-const to = require("../../../utils/to").to;
-const append_error_and_call_next = require("../../../utils/to").append_error_and_call_next;
+const to = require("../../../utils/utils").to;
+const append_error_and_call_next = require("../../../utils/utils").append_error_and_call_next;
 const mysql_queries = require('../../../db/queries').mysql;
 const errors = require("../../../routes/errors/error_codes").ERRORS;
 const execute_query = require('../../../db/mysql_connection').execute_query;

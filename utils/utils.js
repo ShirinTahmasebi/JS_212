@@ -11,3 +11,11 @@ module.exports.append_error_and_call_next = (response, error, next) => {
   append_custom_error_to_response(response, error);
   next();
 };
+
+module.exports.enum_element_count = (enumName) => {
+  let count = 0;
+  for (let item in enumName) {
+    if (isNaN(Number(item))) count++;
+  }
+  return count;
+};

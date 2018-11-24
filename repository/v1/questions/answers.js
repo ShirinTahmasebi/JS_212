@@ -1,5 +1,5 @@
 module.exports.save_answer_to_mongodb = async (question_id, user_id, answer_text, question_type) => {
-  const to = require("../../../utils/to").to;
+  const to = require("../../../utils/utils").to;
   const answer_model = require('../../../model/mongo_models/answers');
   let answer = await new answer_model();
   answer.question_id = question_id;
