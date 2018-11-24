@@ -9,8 +9,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
-require('./db')();
-require('./routes')(app);
-require('./utils/services').errors(app);
+require('./src/db')();
+require('./src/routes')(app);
+require('./src/utils/services').errors(app);
 
 module.exports = app;
