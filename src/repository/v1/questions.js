@@ -1,25 +1,31 @@
+const to = require("../../utils/utils").to;
+const database_errors = require("../../routes/errors/error_codes").ERRORS.database_errors;
+const execute_query = require('../../db/mysql_connection').execute_query;
+
 module.exports.retrieve_all_QA_by_user_id = async (user_id) => {
-  const to = require("../../utils/utils").to;
-  const answer_model = require('../../model/mongo_models/answers');
-  const [error, mongoos_res] = await to(answer_model.find({user_id}).exec());
-  console.log(mongoos_res);
-  return [error, mongoos_res];
+  const answer_model = require('../../model/mongo_models/answers').answer_schema;
+  const [error, mongoos_res] = await to(answer_model.find({user_id}, {'answer_choices._id': 0, _id: 0, __v: 0}).exec());
+  if (error) {
+    return [database_errors.CODE_100003, null];
+  }
+  return [null, mongoos_res];
 };
 
 module.exports.get_questions_choices = async (question_type) => {
-  const to = require("../../utils/utils").to;
-  const database_errors = require("../../routes/errors/error_codes").ERRORS.database_errors;
-  const execute_query = require('../../db/mysql_connection').execute_query;
-
   const [get_question_query, get_choices_query] = await this.get_query_by_question_type(question_type);
   const [get_question_error, get_question_result] = await to(execute_query(get_question_query));
 
   if (get_choices_query === '') {
-    return [get_question_error, null, get_question_result, null];
+    return [get_question_error ? database_errors.CODE_100001 : null, null, get_question_result, null];
   } else {
     const data = await(get_question_result[0] || {});
     const [get_choices_error, get_choices_result] = await to(execute_query(get_choices_query.replace('{question_id}', data.question_id)));
-    return [get_question_error, get_choices_error, get_question_result, get_choices_result];
+    return [
+      get_question_error ? database_errors.CODE_100001 : null,
+      get_choices_error ? database_errors.CODE_100003 : null,
+      get_question_result,
+      get_choices_result,
+    ];
   }
 };
 

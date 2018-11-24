@@ -8,13 +8,8 @@ module.exports.get_single_question = async (req, res, next) => {
   const [get_question_error, get_choices_error, get_question_result, get_choices_result] =
     await question_repository.get_questions_choices(req.query.question_type);
 
-  if (get_question_error) {
-    append_error_and_call_next(res, database_errors.CODE_100001, next);
-    return;
-  }
-
-  if (get_choices_error) {
-    append_error_and_call_next(res, database_errors.CODE_100003, next);
+  if (get_question_error !== null || get_choices_error !== null) {
+    append_error_and_call_next(res, get_question_error || get_choices_error, next);
     return;
   }
 
@@ -32,6 +27,10 @@ module.exports.get_single_question = async (req, res, next) => {
 module.exports.get_all_questions_answers = async (req, res, next) => {
   // Retrieve all questions and answers by user_id
   const [err, questions_answers] = await question_repository.retrieve_all_QA_by_user_id(req.headers.user_id);
-  if (err) return [err, null];
-
+  if (err) {
+    append_error_and_call_next(err, next);
+    return;
+  }
+  res.data = questions_answers;
+  next();
 };

@@ -11,6 +11,7 @@ const queries = {
     answers: {
       get_choice_ids_by_question_id: 'SELECT choice_id FROM questions_choices WHERE question_id={question_id}',
       get_choice_text_by_question_id: 'SELECT choices.choice_id, choices.choice_type, choices.choice FROM (questions INNER JOIN questions_choices ON questions.question_id = questions_choices.question_id) INNER JOIN choices ON choices.choice_id = questions_choices.choice_id WHERE questions.question_id = {question_id}',
+      get_choice_by_id: 'SELECT * FROM choices WHERE choice_id = {choice_id}',
     },
     users: {},
   },
