@@ -19,13 +19,37 @@ describe('GET /api/v1/questions', function () {
 });
 
 describe('GET /api/v1/questions', function () {
-  it('User is authorized. It should return ping PONG', function (done) {
+  it('User is authorized. It should return a list of questions', function (done) {
     request(app)
       .get('/api/v1/questions')
       .set({'user_id': '1', Accept: 'application/json'})
       .expect('Content-Type', /json/)
       .expect(function (res) {
-        res.body.ping.should.equal('PONG');
+        if (res.body.data.length === 0) {
+          expect(res.body.data).to.eql([]);
+          expect(res.body.error).to.eql({});
+          // noinspection BadExpressionStatementJS
+          expect(res.body.error.code).to.be.undefined;
+          // noinspection BadExpressionStatementJS
+          expect(res.body.error.message).to.be.undefined;
+        } else {
+          expect(res.body.error).to.eql({});
+          // noinspection BadExpressionStatementJS
+          expect(res.body.error.code).to.be.undefined;
+          // noinspection BadExpressionStatementJS
+          expect(res.body.error.message).to.be.undefined;
+          for (const item of res.body.data) {
+            if (item.question_type === 1) {
+              item.should.have.property('question_id');
+              item.should.have.property('question_type');
+              item.should.have.property('answer_text');
+            } else if (item.question_type === 2) {
+              item.should.have.property('question_id');
+              item.should.have.property('question_type');
+              item.should.have.property('answer_choices');
+            }
+          }
+        }
       })
       .expect(200)
       .end(done);
