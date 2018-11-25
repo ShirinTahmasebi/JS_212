@@ -1,6 +1,5 @@
 const to = require("../../utils/utils").to;
 const database_errors = require("../../routes/errors/error_codes").ERRORS.database_errors;
-const logic_errors = require("../../routes/errors/error_codes").ERRORS.logic_errors;
 const execute_query = require('../../db/mysql_connection').execute_query;
 
 module.exports.retrieve_all_QA_by_user_id = async (user_id) => {
@@ -12,24 +11,18 @@ module.exports.retrieve_all_QA_by_user_id = async (user_id) => {
   return [null, mongoos_res];
 };
 
-module.exports.get_questions_choices = async (question_type, user_id) => {
+module.exports.get_question_with_choices = async (question_type, user_previous_questions) => {
   const mysql_queries = require('../../db/queries').mysql;
   const QUESTION_TYPES = require('../../model/question_types');
 
-  const [error, user_previous_questions] = await this.get_and_format_user_previous_questions(user_id);
-  if (error) {
-    return [error, error, null, null];
-  }
   const get_question_query = await this.get_query_by_question_type(question_type, user_previous_questions);
   const [get_question_error, get_question_result] = await to(execute_query(get_question_query));
 
   if (!get_question_result || get_question_error) {
     return [get_question_result ? get_question_error : database_errors.CODE_100001, null];
-  } else if (get_question_result.length === 0) {
-    return [logic_errors.CODE_200003, null];
   }
 
-  let get_choices_query;
+  let get_choices_query = '';
   if (get_question_result[0] && get_question_result[0].question_type === QUESTION_TYPES.SIMPLE) {
     get_choices_query = '';
   } else if (get_question_result[0] && get_question_result[0].question_type === QUESTION_TYPES.MULTI_CHOICE) {
@@ -48,18 +41,6 @@ module.exports.get_questions_choices = async (question_type, user_id) => {
       get_choices_result,
     ];
   }
-};
-
-this.get_and_format_user_previous_questions = async (user_id) => {
-  const [error, mongoose_result] = await this.get_user_previous_questions(user_id);
-  if (error) {
-    return [error, null];
-  }
-  const question_ids_set = new Set();
-  for (const item of mongoose_result) {
-    question_ids_set.add(item.question_id);
-  }
-  return [null, Array.from(question_ids_set).toString()];
 };
 
 this.get_user_previous_questions = async (user_id) => {
