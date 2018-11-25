@@ -162,6 +162,10 @@ To get question with specific type, you should add question_type at the end of t
     ```
     
 ### Answer to multi-choice question
+
+  To answer to a multi-choice question, you should add `answer_choices_ids` field in request body. This field is an array of choice ids.
+  By the way, the question id should be placed in the URL.
+  E.g. we want to send answer to a question which its id is 2 and its type is multi-choice:
   
   * Request: ```POST http://localhost:3000/api/v1/questions/2/answer```</br>
   * Header: ```{user_id: 1}``` </br>
@@ -182,9 +186,6 @@ To get question with specific type, you should add question_type at the end of t
     ```
     
 ### Get questions and answers of a user
-  To get all questions and answers of a user, you should add `answer_choices_ids` field in request body. This field is an array of choice ids.
-  By the way, the question id should be placed in the URL.
-  E.g. we want to send answer to a question which its id is 1 and its type is multi-choice:
   
   * Request: ```GET http://localhost:3000/api/v1/questions/```</br>
   * Header: ```{user_id: 1}``` </br>
