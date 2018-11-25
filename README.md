@@ -1,10 +1,43 @@
 # JS_212
 
+## Directory Tree
+```
++-- docs
++-- src
+|   +-- controller
+|   |   +-- v1
+|   |   |   +-- answers.js     ===> Contains handler methods for routes which are defined in routes/v1/answers.js
+|   |   |   +-- questions.js     ===> Contains handler methods for routes which are defined in routes/v1/questions.js
+|   |   |   +-- index.js
+|   +-- db
+|   |   +-- mongo_connection.js    ===> Contains methods to create connection to mongodb
+|   |   +-- mysql_connection.js    ===> Contains methods to create connection and make query to mysql
+|   |   +-- queries.js    ===> Contains query strings
+|   |   +-- index.js
+|   +-- model
+|   +-- repository
+|   |   +-- answers.js     ===> Contains methods to retrieve answers info from databases
+|   |   +-- questions.js     ===> Contains methods to retrieve questions info from databases
+|   |   +-- index.js
+|   +-- routes
+|   |   +-- errors    ===> Contains error code and relevant methods 
+|   |   +-- v1        ===> Contains middlewares
+|   +-- utils
++-- test/v1
+|   +-- index.test.js   
+|   +-- answers.test.js    ===> Contains test cases for answers' requests
+|   +-- questions.test.js    ===> Contains test cases for questions' requests
++-- app.js
+|
+|
+...
+```
+
 ## Overall Architecture
 <img src="https://github.com/ShirinTahmasebi/JS_212/blob/master/docs/overall_architecture.png" alt="architecture" width="1000" height="1000">
 
-## Web Service
 
+## Web Service
  
 ### Get a question (and its choices)
 
