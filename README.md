@@ -32,7 +32,7 @@
 
 ## Directory Tree
 ```
-+-- docs
++-- docs ===> Contains exported files from mysql database schema
 +-- src
 |   +-- controller
 |   |   +-- v1
