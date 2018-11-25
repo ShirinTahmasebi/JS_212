@@ -2,8 +2,9 @@ const request = require('supertest');
 const app = require('../../app');
 const chai = require('chai');
 const assert = chai.assert;
-const should = chai.should();
+chai.should();
 const expect = chai.expect;
+const user_id = 2;
 
 describe('GET /api/v1/answer', function () {
   it('User is not authorized. It should return 401 error with message USER_AUTHENTICATION_PROBLEM', function (done) {
@@ -23,7 +24,7 @@ describe('GET /api/v1/questions/answer', function () {
   it('User is authorized. It should return felan bisar', function (done) {
     request(app)
       .get('/api/v1/questions/answer')
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .expect('Content-Type', /json/)
       .expect(function (res) {
         res.body.felan.should.equal('BISAR');
@@ -39,13 +40,13 @@ describe('POST /api/v1/questions/{simple_question_id}/answer', function () {
     request(app)
       .get('/api/v1/questions/single')
       .query({question_type: '1'})
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .expect(function (res) {
         simple_question_id = res.body.data.question_id;
 
         request(app)
           .post(`/api/v1/questions/${simple_question_id}/answer`)
-          .set({'user_id': '1', Accept: 'application/json'})
+          .set({user_id, Accept: 'application/json'})
           .send({answer_text: 'some text'})
           .expect('Content-Type', /json/)
           .expect(function (res) {
@@ -70,14 +71,14 @@ describe('POST /api/v1/questions/{simple_question_id}/answer', function () {
     await request(app)
       .get('/api/v1/questions/single')
       .query({question_type: '1'})
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .expect(function (res) {
         simple_question_id = res.body.data.question_id;
       });
 
     await request(app)
       .post(`/api/v1/questions/${simple_question_id}/answer`)
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .send({answer_choices_ids: [1]})
       .expect('Content-Type', /json/)
       .expect(function (res) {
@@ -104,18 +105,25 @@ describe('POST /api/v1/questions/{simple_question_id}/answer', function () {
 
 describe('POST /api/v1/questions/{multi_choice_question_id}/answer', function () {
   it('Question type is multi_choice. Request has answer_text field. Result is 200001 error code.', async function () {
-    let simple_question_id = 0;
+    let multi_choice_question_id = 0;
+    let no_question_left_error = false;
     await request(app)
       .get('/api/v1/questions/single')
       .query({question_type: '2'})
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .expect(function (res) {
-        simple_question_id = res.body.data.question_id;
+        if (Object.keys(res.body.data).length !== 0) {
+          multi_choice_question_id = res.body.data.question_id;
+        } else {
+          no_question_left_error = true;
+        }
       });
-
+    if (no_question_left_error) {
+      return;
+    }
     await request(app)
-      .post(`/api/v1/questions/${simple_question_id}/answer`)
-      .set({'user_id': '1', Accept: 'application/json'})
+      .post(`/api/v1/questions/${multi_choice_question_id}/answer`)
+      .set({user_id, Accept: 'application/json'})
       .send({answer_text: 'some text'})
       .expect('Content-Type', /json/)
       .expect(function (res) {
@@ -131,6 +139,7 @@ describe('POST /api/v1/questions/{multi_choice_question_id}/answer', function ()
         expect(res.body.data.question_type).to.be.undefined;
         // noinspection BadExpressionStatementJS
         expect(res.body.data.answer_text).to.be.undefined;
+
       })
       .expect(200);
 
@@ -145,15 +154,23 @@ describe('POST /api/v1/questions/{multichoice_question_id}/answer', function () 
 
     let multi_choice_question_id = '';
     let answer_choices_ids = [];
-
+    let no_question_left_error = false;
     await request(app)
       .get('/api/v1/questions/single')
       .query({question_type: '2'})
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .expect(async function (res) {
-          multi_choice_question_id = res.body.data.question_id;
+          if (Object.keys(res.body.data).length !== 0) {
+            multi_choice_question_id = res.body.data.question_id;
+          } else {
+            no_question_left_error = true;
+          }
         },
       );
+
+    if (no_question_left_error) {
+      return;
+    }
 
     const execute_query = require('../../src/db/mysql_connection').execute_query;
     const mysql_queries = require('../../src/db/queries').mysql;
@@ -166,7 +183,7 @@ describe('POST /api/v1/questions/{multichoice_question_id}/answer', function () 
 
     await request(app)
       .post(`/api/v1/questions/${multi_choice_question_id}/answer`)
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .send({answer_choices_ids: answer_choices_ids})
       .expect('Content-Type', /json/)
       .expect(function (res) {
@@ -194,17 +211,24 @@ describe('POST /api/v1/questions/{multichoice_question_id}/answer', function () 
 
     let multi_choice_question_id = '';
     let answer_choices_ids = [];
-    let isResolved = true;
+    let no_question_left_error = false;
 
     await request(app)
       .get('/api/v1/questions/single')
       .query({question_type: '2'})
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .expect(async function (res) {
-          multi_choice_question_id = res.body.data.question_id;
+          if (Object.keys(res.body.data).length !== 0) {
+            multi_choice_question_id = res.body.data.question_id;
+          } else {
+            no_question_left_error = true;
+          }
         },
       );
 
+    if (no_question_left_error) {
+      return;
+    }
     const execute_query = require('../../src/db/mysql_connection').execute_query;
     const mysql_queries = require('../../src/db/queries').mysql;
 
@@ -216,7 +240,7 @@ describe('POST /api/v1/questions/{multichoice_question_id}/answer', function () 
 
     await request(app)
       .post(`/api/v1/questions/${multi_choice_question_id}/answer`)
-      .set({'user_id': '1', Accept: 'application/json'})
+      .set({user_id, Accept: 'application/json'})
       .send({answer_choices_ids: answer_choices_ids})
       .expect('Content-Type', /json/)
       .expect(function (res) {

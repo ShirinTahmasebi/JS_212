@@ -11,6 +11,7 @@ module.exports.ERRORS = {
   logic_errors: {
     CODE_200001: {code: 200001, message: 'QUESTION_ANSWER_TYPE_MISMATCH'},
     CODE_200002: {code: 200002, message: 'INVALID_CHOICE_IDS'},
+    CODE_200003: {code: 200003, message: 'NO_NEW_QUESTION'},
   },
 }
 ;

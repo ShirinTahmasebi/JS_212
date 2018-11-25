@@ -1,5 +1,6 @@
 const to = require("../../utils/utils").to;
 const database_errors = require("../../routes/errors/error_codes").ERRORS.database_errors;
+const logic_errors = require("../../routes/errors/error_codes").ERRORS.logic_errors;
 const execute_query = require('../../db/mysql_connection').execute_query;
 
 module.exports.retrieve_all_QA_by_user_id = async (user_id) => {
@@ -24,6 +25,8 @@ module.exports.get_questions_choices = async (question_type, user_id) => {
 
   if (!get_question_result || get_question_error) {
     return [get_question_result ? get_question_error : database_errors.CODE_100001, null];
+  } else if (get_question_result.length === 0) {
+    return [logic_errors.CODE_200003, null];
   }
 
   let get_choices_query;
@@ -72,7 +75,7 @@ this.get_query_by_question_type = async (question_type, user_previous_questions)
   const mysql_queries = require('../../db/queries').mysql;
   const QUESTION_TYPES = require('../../model/question_types');
   question_type = parseInt(question_type) || 0;
-  let get_question_id_query = '';
+  let get_question_id_query;
   switch (question_type) {
     case QUESTION_TYPES.SIMPLE:
       get_question_id_query =
@@ -92,5 +95,8 @@ this.get_query_by_question_type = async (question_type, user_previous_questions)
         get_question_id_query = mysql_queries.questions.get_random_question;
       break;
   }
-  return get_question_id_query.replace('{previous_question_ids}', user_previous_questions);
+  if (get_question_id_query) {
+    get_question_id_query = get_question_id_query.replace('{previous_question_ids}', user_previous_questions);
+  }
+  return get_question_id_query;
 };
