@@ -1,5 +1,35 @@
 # JS_212
 
+[Overall directory tree](#directory-tree)
+
+[Overall architecture](#overall-architecture)
+
+[Web services](#web-service)
+
+[Error codes](#error-codes)
+
+## Task List:
+### Request handlers:
+- [ ] Add authentication section
+- [x] Add handler for get simple question
+- [x] Add handler for get multi-choice question
+- [x] Add handler for answer simple question
+- [x] Add handler for answer multi-choice question
+- [x] Add handler for retrieve conversations
+- [x] Add handler for retrieve conversations
+- [x] Add suitable error handlers
+### Test cases:
+- [x] Add test cases for questions queries
+- [x] Add test cases for answers queries
+### Persistance:
+- [ ] Store sessions in redis
+- [x] Store questions in mysql
+- [x] Store answers in mongodb
+### Refactoring:
+- [x] Code review
+- [x] Complete test case to see if all scenarios are added or not 
+
+
 ## Directory Tree
 ```
 +-- docs
