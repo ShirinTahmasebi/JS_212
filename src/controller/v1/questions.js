@@ -3,7 +3,7 @@ const logic_errors = require("../../routes/errors/error_codes").ERRORS.logic_err
 const execute_query = require('../../db/mysql_connection').execute_query;
 const to = require("../../utils/utils").to;
 const append_error_and_call_next = require("../../utils/utils").append_error_and_call_next;
-const question_repository = require('../../repository/v1/index').questions;
+const question_repository = require('../../repository/index').questions;
 
 module.exports.get_single_question = async (req, res, next) => {
   const [error, user_previous_questions] = await this.get_and_format_user_previous_questions(req.headers.user_id);

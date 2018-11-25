@@ -1,9 +1,9 @@
-const to = require("../../utils/utils").to;
-const database_errors = require("../../routes/errors/error_codes").ERRORS.database_errors;
-const execute_query = require('../../db/mysql_connection').execute_query;
+const to = require("../utils/utils").to;
+const database_errors = require("../routes/errors/error_codes").ERRORS.database_errors;
+const execute_query = require('../db/mysql_connection').execute_query;
 
 module.exports.retrieve_all_QA_by_user_id = async (user_id) => {
-  const answer_model = require('../../model/mongo_models/answers').answer_schema;
+  const answer_model = require('../model/mongo_models/answers').answer_schema;
   const [error, mongoos_res] = await to(answer_model.find({user_id}, {'answer_choices._id': 0, _id: 0, __v: 0}).exec());
   if (error) {
     return [database_errors.CODE_100003, null];
@@ -12,8 +12,8 @@ module.exports.retrieve_all_QA_by_user_id = async (user_id) => {
 };
 
 module.exports.get_question_with_choices = async (question_type, user_previous_questions) => {
-  const mysql_queries = require('../../db/queries').mysql;
-  const QUESTION_TYPES = require('../../model/question_types');
+  const mysql_queries = require('../db/queries').mysql;
+  const QUESTION_TYPES = require('../model/question_types');
 
   const get_question_query = await this.get_query_by_question_type(question_type, user_previous_questions);
   const [get_question_error, get_question_result] = await to(execute_query(get_question_query));
@@ -44,7 +44,7 @@ module.exports.get_question_with_choices = async (question_type, user_previous_q
 };
 
 this.get_user_previous_questions = async (user_id) => {
-  const answer_model = require('../../model/mongo_models/answers').answer_schema;
+  const answer_model = require('../model/mongo_models/answers').answer_schema;
   const [error, mongoos_res] = await to(answer_model.find({user_id}, {question_id: 1, _id: 0}).exec());
   if (error) {
     return [database_errors.CODE_100003, null];
@@ -53,8 +53,8 @@ this.get_user_previous_questions = async (user_id) => {
 };
 
 this.get_query_by_question_type = async (question_type, user_previous_questions) => {
-  const mysql_queries = require('../../db/queries').mysql;
-  const QUESTION_TYPES = require('../../model/question_types');
+  const mysql_queries = require('../db/queries').mysql;
+  const QUESTION_TYPES = require('../model/question_types');
   question_type = parseInt(question_type) || 0;
   let get_question_id_query;
   switch (question_type) {
