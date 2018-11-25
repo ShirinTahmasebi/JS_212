@@ -11,9 +11,27 @@ module.exports.retrieve_all_QA_by_user_id = async (user_id) => {
   return [null, mongoos_res];
 };
 
-module.exports.get_questions_choices = async (question_type) => {
-  const [get_question_query, get_choices_query] = await this.get_query_by_question_type(question_type);
+module.exports.get_questions_choices = async (question_type, user_id) => {
+  const mysql_queries = require('../../db/queries').mysql;
+  const QUESTION_TYPES = require('../../model/question_types');
+
+  const [error, user_previous_questions] = await this.get_and_format_user_previous_questions(user_id);
+  if (error) {
+    return [error, error, null, null];
+  }
+  const get_question_query = await this.get_query_by_question_type(question_type, user_previous_questions);
   const [get_question_error, get_question_result] = await to(execute_query(get_question_query));
+
+  if (!get_question_result || get_question_error) {
+    return [get_question_result ? get_question_error : database_errors.CODE_100001, null];
+  }
+
+  let get_choices_query;
+  if (get_question_result[0] && get_question_result[0].question_type === QUESTION_TYPES.SIMPLE) {
+    get_choices_query = '';
+  } else if (get_question_result[0] && get_question_result[0].question_type === QUESTION_TYPES.MULTI_CHOICE) {
+    get_choices_query = mysql_queries.answers.get_choice_text_by_question_id;
+  }
 
   if (get_choices_query === '') {
     return [get_question_error ? database_errors.CODE_100001 : null, null, get_question_result, null];
@@ -29,24 +47,50 @@ module.exports.get_questions_choices = async (question_type) => {
   }
 };
 
-this.get_query_by_question_type = async (question_type) => {
+this.get_and_format_user_previous_questions = async (user_id) => {
+  const [error, mongoose_result] = await this.get_user_previous_questions(user_id);
+  if (error) {
+    return [error, null];
+  }
+  const question_ids_set = new Set();
+  for (const item of mongoose_result) {
+    question_ids_set.add(item.question_id);
+  }
+  return [null, Array.from(question_ids_set).toString()];
+};
+
+this.get_user_previous_questions = async (user_id) => {
+  const answer_model = require('../../model/mongo_models/answers').answer_schema;
+  const [error, mongoos_res] = await to(answer_model.find({user_id}, {question_id: 1, _id: 0}).exec());
+  if (error) {
+    return [database_errors.CODE_100003, null];
+  }
+  return [null, mongoos_res];
+};
+
+this.get_query_by_question_type = async (question_type, user_previous_questions) => {
   const mysql_queries = require('../../db/queries').mysql;
   const QUESTION_TYPES = require('../../model/question_types');
-  if (!question_type) {
-    const enum_element_count = require("../../utils/utils").enum_element_count;
-    question_type = Math.floor((Math.random() * enum_element_count(QUESTION_TYPES) + 1));
-  }
   question_type = parseInt(question_type) || 0;
-  let get_question_id_query;
-  let get_choice_query = '';
+  let get_question_id_query = '';
   switch (question_type) {
     case QUESTION_TYPES.SIMPLE:
-      get_question_id_query = mysql_queries.questions.get_random_simple_question;
+      get_question_id_query =
+        user_previous_questions ?
+          mysql_queries.questions.get_random_simple_question_except_prev_questions :
+          mysql_queries.questions.get_random_simple_question;
       break;
     case QUESTION_TYPES.MULTI_CHOICE:
-      get_question_id_query = mysql_queries.questions.get_random_multi_choice_question;
-      get_choice_query = mysql_queries.answers.get_choice_text_by_question_id;
+      get_question_id_query =
+        user_previous_questions ?
+          mysql_queries.questions.get_random_multi_choice_question_except_prev_questions :
+          mysql_queries.questions.get_random_multi_choice_question;
+      break;
+    case 0:
+      user_previous_questions ?
+        get_question_id_query = mysql_queries.questions.get_random_question_except_prev_questions :
+        get_question_id_query = mysql_queries.questions.get_random_question;
       break;
   }
-  return [get_question_id_query, get_choice_query];
+  return get_question_id_query.replace('{previous_question_ids}', user_previous_questions);
 };

@@ -6,7 +6,7 @@ const question_repository = require('../../repository/v1/index').questions;
 
 module.exports.get_single_question = async (req, res, next) => {
   const [get_question_error, get_choices_error, get_question_result, get_choices_result] =
-    await question_repository.get_questions_choices(req.query.question_type);
+    await question_repository.get_questions_choices(req.query.question_type, req.headers.user_id);
 
   if (get_question_error !== null || get_choices_error !== null) {
     append_error_and_call_next(res, get_question_error || get_choices_error, next);
