@@ -70,8 +70,6 @@ this.validate_answer_to_multichoice_question = async (request, response) => {
         question_types.MULTI_CHOICE,
       );
     if (err) return [err, null];
-
-    // TODO: Store answered question id in Redis
     return [null, {question_id, answer_choices_ids, 'question_type': question_types.MULTI_CHOICE}];
   } else {
     return [errors.logic_errors.CODE_200002, null];
@@ -86,7 +84,5 @@ this.validate_answer_to_simple_question = async (request, response) => {
   // Store answer in MongoDB
   const [err, res] = await answer_repository.save_answer_simple_to_mongodb(question_id, user_id, answer_text, question_types.SIMPLE);
   if (err) return [err, null];
-
-  // TODO: Store answered question id in Redis
   return [null, {question_type: question_types.SIMPLE, question_id, answer_text}];
 };
